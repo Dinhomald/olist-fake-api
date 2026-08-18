@@ -49,3 +49,11 @@ uvicorn main:app --reload
 **Causa raiz:** um processo `uvicorn` anterior ainda estava vivo, ocupando a porta 8000. O processo novo falhava ao tentar bindar nessa porta e encerrava, mas esse erro ficava mascarado porque o processo antigo continuava no ar e respondendo às requisições normalmente.
 
 **Solução:** adotei como prática padrão verificar `netstat -ano | findstr :8000` (ou o Gerenciador de Tarefas) antes de subir o servidor, garantindo que não há processo residual ocupando a porta.
+
+### 4. Paginação incompatível com a Pagination Rule do Azure Data Factory
+
+**Problema:** o consumo da API via Azure Data Factory usa uma Pagination Rule do tipo `AbsoluteUrl` com origem `Body`, que extrai a URL da próxima página direto da resposta via JSONPath (ex: `$.next_page_url`). Esse mecanismo do ADF não suporta expressões condicionais/computadas — ele só sabe ler um valor que já venha pronto no JSON.
+
+**Causa raiz:** a API só retornava `page`, `total_pages` e `has_next`, deixando o cálculo da URL da próxima página a cargo do cliente. Isso funciona para um cliente que sabe montar URLs, mas não para o ADF, que só sabe copiar um campo.
+
+**Solução:** o servidor agora calcula e retorna a URL completa da próxima página. `paginate()` passou a receber um `request_path` (o path de cada endpoint, ex: `/orders`) e monta `next_page_url` como `https://olist-fake-api.onrender.com{request_path}?page={page+1}` quando há próxima página, ou `null` na última página — pronto para o ADF consumir via `$.next_page_url` sem precisar de nenhuma lógica adicional.
