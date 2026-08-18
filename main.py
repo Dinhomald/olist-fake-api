@@ -10,14 +10,23 @@ orders_df = pd.read_csv("data/olist_orders_dataset.csv", parse_dates=[
 ])
 
 order_items_df = pd.read_csv("data/olist_order_items_dataset.csv")
-customers_df = pd.read_csv("data/olist_customers_dataset.csv")
+customers_df = pd.read_csv(
+    "data/olist_customers_dataset.csv",
+    dtype={"customer_zip_code_prefix": str}
+)
 products_df = pd.read_csv("data/olist_products_dataset.csv")
-sellers_df = pd.read_csv("data/olist_sellers_dataset.csv")
+sellers_df = pd.read_csv(
+    "data/olist_sellers_dataset.csv",
+    dtype={"seller_zip_code_prefix": str}
+)
 payments_df = pd.read_csv("data/olist_order_payments_dataset.csv")
 reviews_df = pd.read_csv("data/olist_order_reviews_dataset.csv", parse_dates=[
     "review_creation_date", "review_answer_timestamp"
 ])
-geolocation_df = pd.read_csv("data/olist_geolocation_dataset.csv")
+geolocation_df = pd.read_csv(
+    "data/olist_geolocation_dataset.csv",
+    dtype={"geolocation_zip_code_prefix": str}
+)
 category_translation_df = pd.read_csv("data/product_category_name_translation.csv")
 
 def paginate(df: pd.DataFrame, page: int, request_path: str, page_size: int = 100):
